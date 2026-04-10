@@ -17,11 +17,16 @@ import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { seedDatabase } from '../lib/seed';
 import { toast } from 'sonner';
+import { auth } from '../lib/firebase';
 
 export function Dashboard() {
   const [seeding, setSeeding] = useState(false);
 
   const handleSeed = async () => {
+    if (!auth.currentUser) {
+      toast.error("Você precisa estar logado para popular o banco de dados.");
+      return;
+    }
     setSeeding(true);
     const result = await seedDatabase();
     if (result.success) {
@@ -135,8 +140,8 @@ export function Dashboard() {
 
         <Card className="col-span-3 bg-zinc-900 border-zinc-800 text-white">
           <CardHeader>
-            <CardTitle>Destaques da Base</CardTitle>
-            <CardDescription className="text-zinc-500">Aprenda novos conceitos hoje.</CardDescription>
+            <CardTitle>Insights e Atualizações</CardTitle>
+            <CardDescription className="text-zinc-500">Fique por dentro das mudanças na legislação e dicas técnicas.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 rounded-xl bg-orange-600/10 border border-orange-600/20 space-y-2">
@@ -145,7 +150,7 @@ export function Dashboard() {
                 Guia: Substituição Tributária
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Entenda como funciona o recolhimento antecipado do ICMS e evite bitributação em suas operações.
+                Entenda como funciona o recolhimento antecipado do ICMS e evite a bitributação em suas operações.
               </p>
               <Button variant="link" className="p-0 h-auto text-orange-500 text-xs">Ler artigo completo →</Button>
             </div>
@@ -156,9 +161,20 @@ export function Dashboard() {
                 Novidade: DIFAL 2024
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Confira as novas alíquotas e regras para o Diferencial de Alíquota em operações interestaduais.
+                Confira as novas alíquotas e regras para o Diferencial de Alíquota em operações interestaduais para consumidores finais.
               </p>
               <Button variant="link" className="p-0 h-auto text-zinc-400 text-xs">Ver detalhes →</Button>
+            </div>
+
+            <div className="p-4 rounded-xl bg-blue-600/10 border border-blue-600/20 space-y-2">
+              <h3 className="font-semibold text-blue-500 flex items-center gap-2">
+                <Zap size={16} />
+                Dica: Malha Fiscal
+              </h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Como evitar inconsistências entre o EFD Reinf e a DCTFWeb no fechamento mensal.
+              </p>
+              <Button variant="link" className="p-0 h-auto text-blue-500 text-xs">Ver dica técnica →</Button>
             </div>
           </CardContent>
         </Card>

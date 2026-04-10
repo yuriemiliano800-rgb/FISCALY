@@ -32,7 +32,7 @@ export async function seedDatabase() {
 
     // Seed Articles
     mockArticles.forEach((art, index) => {
-      const ref = doc(collection(db, 'knowledge_articles'), `art_${index}`);
+      const ref = doc(collection(db, 'articles'), `art_${index}`);
       batch.set(ref, art);
     });
 

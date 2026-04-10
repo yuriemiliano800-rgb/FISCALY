@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Search, 
@@ -12,12 +12,17 @@ import {
   ChevronRight,
   FileText,
   Database,
-  ShieldCheck
+  ShieldCheck,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { auth } from '@/lib/firebase';
+import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   activeTab: string;
@@ -42,6 +47,34 @@ const menuItems = [
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['consultations']);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      toast.success("Login realizado com sucesso!");
+    } catch (error) {
+      console.error("Login Error:", error);
+      toast.error("Erro ao realizar login.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Sessão encerrada.");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedItems(prev => 
@@ -124,17 +157,33 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
       <div className="p-4 border-top border-zinc-800">
         <Separator className="bg-zinc-800 mb-4" />
-        <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-zinc-300">
-            YU
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-medium text-white truncate">Yuri Emiliano</span>
-              <span className="text-xs text-zinc-500 truncate">Sócio Diretor</span>
+        {user ? (
+          <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
+            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-xs font-medium text-white overflow-hidden">
+              {user.photoURL ? <img src={user.photoURL} alt="User" /> : user.displayName?.charAt(0) || 'U'}
             </div>
-          )}
-        </div>
+            {!collapsed && (
+              <div className="flex flex-col overflow-hidden flex-1">
+                <span className="text-sm font-medium text-white truncate">{user.displayName}</span>
+                <span className="text-xs text-zinc-500 truncate">{user.email}</span>
+              </div>
+            )}
+            {!collapsed && (
+              <Button variant="ghost" size="icon" onClick={handleLogout} className="text-zinc-500 hover:text-red-500">
+                <LogOut size={16} />
+              </Button>
+            )}
+          </div>
+        ) : (
+          <Button 
+            variant="outline" 
+            className={cn("w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900", collapsed && "px-0")}
+            onClick={handleLogin}
+          >
+            <LogIn size={18} className={cn(!collapsed && "mr-2")} />
+            {!collapsed && "Entrar"}
+          </Button>
+        )}
       </div>
     </div>
   );
