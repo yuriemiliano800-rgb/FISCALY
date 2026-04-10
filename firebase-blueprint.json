@@ -1,0 +1,78 @@
+{
+  "entities": {
+    "cfop": {
+      "title": "CFOP",
+      "description": "Código Fiscal de Operações e Prestações",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "description": "Código de 4 dígitos" },
+        "description": { "type": "string", "description": "Descrição oficial" },
+        "explanation": { "type": "string", "description": "Explicação simplificada" },
+        "application": { "type": "string", "description": "Aplicação prática" },
+        "examples": { "type": "string", "description": "Exemplos reais" },
+        "type": { "type": "string", "enum": ["entrada", "saida"], "description": "Tipo de operação" },
+        "notes": { "type": "string", "description": "Observações importantes" }
+      },
+      "required": ["code", "description", "type"]
+    },
+    "ncm": {
+      "title": "NCM",
+      "description": "Nomenclatura Comum do Mercosul",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "description": "Código de 8 dígitos" },
+        "description": { "type": "string", "description": "Descrição do produto" },
+        "taxNotes": { "type": "string", "description": "Observações tributárias" }
+      },
+      "required": ["code", "description"]
+    },
+    "cst_csosn": {
+      "title": "CST/CSOSN",
+      "description": "Código de Situação Tributária",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "description": "Código" },
+        "description": { "type": "string", "description": "Descrição" },
+        "regime": { "type": "string", "enum": ["Simples Nacional", "Regime Normal"], "description": "Regime tributário" },
+        "usage": { "type": "string", "description": "Quando usar" },
+        "notes": { "type": "string", "description": "Observações práticas" }
+      },
+      "required": ["code", "description", "regime"]
+    },
+    "simulation": {
+      "title": "Simulação Fiscal",
+      "description": "Registro de simulação de operação tributária",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "originUF": { "type": "string" },
+        "destUF": { "type": "string" },
+        "regime": { "type": "string" },
+        "operationType": { "type": "string" },
+        "isEntry": { "type": "boolean" },
+        "clientType": { "type": "string" },
+        "ncm": { "type": "string" },
+        "result": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "knowledge_article": {
+      "title": "Artigo de Conhecimento",
+      "description": "Conteúdo educacional sobre fiscalidade",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "level": { "type": "string", "enum": ["Básico", "Intermediário", "Avançado"] },
+        "category": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/cfops/{cfopId}": { "schema": "cfop", "description": "Base de dados de CFOPs" },
+    "/ncms/{ncmId}": { "schema": "ncm", "description": "Base de dados de NCMs" },
+    "/cst_csosn/{id}": { "schema": "cst_csosn", "description": "Base de dados de CST e CSOSN" },
+    "/simulations/{simId}": { "schema": "simulation", "description": "Histórico de simulações" },
+    "/articles/{articleId}": { "schema": "knowledge_article", "description": "Base de conhecimento" }
+  }
+}
